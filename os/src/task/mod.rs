@@ -18,7 +18,7 @@ use crate::config::{MAX_APP_NUM, MAX_SYSCALL_NUM};
 use crate::loader::{get_num_app, init_app_cx};
 use crate::sync::UPSafeCell;
 use crate::syscall::TaskInfo;
-use crate::timer::get_time_us;
+use crate::timer::{get_time_ms, get_time_us};
 use lazy_static::*;
 use switch::__switch;
 pub use task::{TaskControlBlock, TaskStatus};
@@ -132,7 +132,7 @@ impl TaskManager {
             inner.tasks[next].task_status = TaskStatus::Running;
             // 开始记录时间
             if inner.tasks[next].start_time == 0 {
-                inner.tasks[next].start_time = get_time_us();
+                inner.tasks[next].start_time = get_time_ms();
             }
             debug!("switch task {} to {}", current, next);
             inner.current_task = next;
@@ -163,7 +163,7 @@ impl TaskManager {
         TaskInfo {
             status: inner.tasks[current].task_status,
             syscall_times: inner.tasks[current].syscall_times,
-            time: get_time_us() - inner.tasks[current].start_time,
+            time: get_time_ms() - inner.tasks[current].start_time,
         }
     }
 }
